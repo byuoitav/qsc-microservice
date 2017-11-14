@@ -71,7 +71,7 @@ func SetVolume(address, name string, level int) (se.Volume, error) {
 		req.Params.Value = -100
 	} else {
 		//do the logrithmic magic
-		req.Params.Value = math.Log10(float64(level)/100) * 10
+		req.Params.Value = math.Log10(float64(level)/100) * 20
 	}
 
 	resp, err := qsysremote.SendCommand(address, req)
@@ -94,7 +94,7 @@ func SetVolume(address, name string, level int) (se.Volume, error) {
 	}
 
 	//reverse it
-	toReturn := math.Pow(10, (val.Result.Value/10)) * 100
+	toReturn := math.Pow(10, (val.Result.Value/20)) * 100
 
 	return se.Volume{int(toReturn)}, nil
 }
