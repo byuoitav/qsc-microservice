@@ -71,8 +71,9 @@ func SetVolume(address, name string, level int) (se.Volume, error) {
 		req.Params.Value = -100
 	} else {
 		//do the logrithmic magic
-		req.Params.Value = math.Log10(float64(level)/100) * 20
+		req.Params.Value = VolToDb(level)
 	}
+	log.Printf("sending: %v", req.Params.Value)
 
 	resp, err := qsysremote.SendCommand(address, req)
 	if err != nil {
@@ -93,16 +94,69 @@ func SetVolume(address, name string, level int) (se.Volume, error) {
 		return se.Volume{}, errors.New(errmsg)
 	}
 
-	//reverse it
-	toReturn := math.Pow(10, (val.Result.Value/20)) * 100
+	return se.Volume{DbToVolumeLevel(val.Result.Value)}, nil
+}
 
-	return se.Volume{int(toReturn)}, nil
+func DbToVolumeLevel(level float64) int {
+	return int(math.Pow(10, (level/20)) * 100)
+}
+
+func VolToDb(level int) float64 {
+	return math.Log10(float64(level)/100) * 20
 }
 
 func GetVolume(address, name string) (se.Volume, error) {
-	return se.Volume{}, nil
+
+	resp, err := GetControlStatus(address, name)
+	if err != nil {
+		log.Printf(color.HiRedString("There was an error: %v", err.Error()))
+		return se.Volume{}, err
+	}
+
+	//get the volume out of the dsp and run it through our equation to reverse it
+	for _, res := range resp.Result {
+		if res.Name == name {
+			return se.Volume{DbToVolumeLevel(res.Value)}, nil
+		}
+	}
+
+	return se.Volume{}, errors.New("[QSC-Communication] No value returned with the name matching the requested state")
 }
 func GetMute(address, name string) (se.MuteStatus, error) {
-	return se.MuteStatus{}, nil
+	resp, err := GetControlStatus(address, name)
+	if err != nil {
+		log.Printf(color.HiRedString("There was an error: %v", err.Error()))
+		return se.MuteStatus{}, err
+	}
 
+	//get the volume out of the dsp and run it through our equation to reverse it
+	for _, res := range resp.Result {
+		if res.Name == name {
+			if res.Value == 1.0 {
+				return se.MuteStatus{Muted: true}, nil
+			}
+			if res.Value == 0.0 {
+				return se.MuteStatus{Muted: false}, nil
+			}
+		}
+	}
+	errmsg := "[QSC-Communication] No value returned with the name matching the requested state"
+	log.Printf(color.HiRedString(errmsg))
+	return se.MuteStatus{}, errors.New(errmsg)
+}
+
+func GetControlStatus(address, name string) (qsysremote.QSCGetStatusResponse, error) {
+	req := qsysremote.GetGenericGetStatusRequest()
+	req.Params = append(req.Params, name)
+
+	toReturn := qsysremote.QSCGetStatusResponse{}
+
+	resp, err := qsysremote.SendCommand(address, req)
+	if err != nil {
+		log.Printf(color.HiRedString(err.Error()))
+		return toReturn, err
+	}
+
+	err = json.Unmarshal(resp, &toReturn)
+	return toReturn, err
 }

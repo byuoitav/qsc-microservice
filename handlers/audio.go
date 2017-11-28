@@ -16,6 +16,7 @@ import (
 func Mute(context echo.Context) error {
 	address := context.Param("address")
 	name := context.Param("name")
+	name = name + "Mute"
 
 	status, err := helpers.Mute(address, name)
 	if err != nil {
@@ -27,6 +28,7 @@ func Mute(context echo.Context) error {
 func UnMute(context echo.Context) error {
 	address := context.Param("address")
 	name := context.Param("name")
+	name = name + "Mute"
 
 	status, err := helpers.UnMute(address, name)
 	if err != nil {
@@ -41,6 +43,7 @@ func SetVolume(context echo.Context) error {
 	name := context.Param("name")
 	levelstr := context.Param("level")
 	level, err := strconv.Atoi(levelstr)
+	name = name + "Gain"
 
 	if err != nil {
 		errmsg := fmt.Sprintf("%v is not a valid parameter for level. Must be a valid float", levelstr)
@@ -58,6 +61,7 @@ func SetVolume(context echo.Context) error {
 func GetVolume(context echo.Context) error {
 	address := context.Param("address")
 	name := context.Param("name")
+	name = name + "Gain"
 
 	status, err := helpers.GetVolume(address, name)
 	if err != nil {
@@ -69,6 +73,7 @@ func GetVolume(context echo.Context) error {
 func GetMute(context echo.Context) error {
 	address := context.Param("address")
 	name := context.Param("name")
+	name = name + "Mute"
 
 	status, err := helpers.GetMute(address, name)
 	if err != nil {
