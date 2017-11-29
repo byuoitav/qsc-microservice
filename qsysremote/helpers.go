@@ -60,6 +60,8 @@ func SendCommand(address string, request interface{}) ([]byte, error) {
 		return []byte{}, err
 	}
 	msg = bytes.Trim(msg, "\x00")
+	log.Printf("%s", toSend)
+	log.Printf("%s", msg)
 	log.Printf(color.HiBlueString("[QSC-Communication] Done with request to %v.", address))
 	return msg, nil
 }

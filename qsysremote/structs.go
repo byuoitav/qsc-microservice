@@ -35,6 +35,11 @@ type QSCGetStatusResult struct {
 	Position float64
 }
 
+type QSCGetStatusRequest struct {
+	BaseRequest
+	Params []string `json:"params"`
+}
+
 type QSCSetStatusRequest struct {
 	BaseRequest
 	Params QSCSetStatusParams `json:"params"`
@@ -50,11 +55,10 @@ type QSCSetStatusResponse struct {
 	Result QSCGetStatusResult `json:"result"`
 }
 
-type TEST struct {
-	BaseRequest
-	Params map[string]string `json:"params"`
-}
-
 func GetGenericSetStatusRequest() QSCSetStatusRequest {
 	return QSCSetStatusRequest{BaseRequest: BaseRequest{JSONRPC: "2.0", ID: 1, Method: "Control.Set"}, Params: QSCSetStatusParams{}}
+}
+
+func GetGenericGetStatusRequest() QSCGetStatusRequest {
+	return QSCGetStatusRequest{BaseRequest: BaseRequest{JSONRPC: "2.0", ID: 1, Method: "Control.Get"}, Params: []string{}}
 }
