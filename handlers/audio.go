@@ -20,7 +20,7 @@ func Mute(context echo.Context) error {
 
 	status, err := helpers.Mute(address, name)
 	if err != nil {
-		return context.JSON(http.StatusInternalServerError, err.Error)
+		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return context.JSON(http.StatusOK, status)
 }
@@ -32,7 +32,7 @@ func UnMute(context echo.Context) error {
 
 	status, err := helpers.UnMute(address, name)
 	if err != nil {
-		return context.JSON(http.StatusInternalServerError, err.Error)
+		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return context.JSON(http.StatusOK, status)
 
@@ -53,7 +53,7 @@ func SetVolume(context echo.Context) error {
 
 	status, err := helpers.SetVolume(address, name, level)
 	if err != nil {
-		return context.JSON(http.StatusInternalServerError, err.Error)
+		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return context.JSON(http.StatusOK, status)
 }
@@ -65,7 +65,7 @@ func GetVolume(context echo.Context) error {
 
 	status, err := helpers.GetVolume(address, name)
 	if err != nil {
-		return context.JSON(http.StatusInternalServerError, err.Error)
+		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return context.JSON(http.StatusOK, status)
 }
@@ -77,7 +77,7 @@ func GetMute(context echo.Context) error {
 
 	status, err := helpers.GetMute(address, name)
 	if err != nil {
-		return context.JSON(http.StatusInternalServerError, err.Error)
+		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return context.JSON(http.StatusOK, status)
 }

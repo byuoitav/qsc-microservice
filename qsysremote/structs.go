@@ -60,5 +60,5 @@ func GetGenericSetStatusRequest() QSCSetStatusRequest {
 }
 
 func GetGenericGetStatusRequest() QSCGetStatusRequest {
-	return QSCGetStatusRequest{BaseRequest: BaseRequest{JSONRPC: "2.0", ID: 1, Method: "Control.Set"}, Params: []string{}}
+	return QSCGetStatusRequest{BaseRequest: BaseRequest{JSONRPC: "2.0", ID: 1, Method: "Control.Get"}, Params: []string{}}
 }

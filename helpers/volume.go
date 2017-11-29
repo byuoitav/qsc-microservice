@@ -113,6 +113,8 @@ func GetVolume(address, name string) (se.Volume, error) {
 		return se.Volume{}, err
 	}
 
+	log.Printf(color.HiBlueString("[QSC-Communication] Response received: %+v", resp))
+
 	//get the volume out of the dsp and run it through our equation to reverse it
 	for _, res := range resp.Result {
 		if res.Name == name {
@@ -158,5 +160,9 @@ func GetControlStatus(address, name string) (qsysremote.QSCGetStatusResponse, er
 	}
 
 	err = json.Unmarshal(resp, &toReturn)
+	if err != nil {
+		log.Printf(color.HiRedString(err.Error()))
+	}
+
 	return toReturn, err
 }
