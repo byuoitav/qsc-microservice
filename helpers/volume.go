@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"strconv"
 
 	se "github.com/byuoitav/av-api/statusevaluators"
 	"github.com/byuoitav/qsc-microservice/qsysremote"
@@ -64,6 +65,7 @@ func setMuteStatus(address, name string, value bool) (se.MuteStatus, error) {
 }
 
 func SetVolume(address, name string, level int) (se.Volume, error) {
+	log.Printf("got: %v", level)
 	req := qsysremote.GetGenericSetStatusRequest()
 	req.Params.Name = name
 
@@ -165,4 +167,37 @@ func GetControlStatus(address, name string) (qsysremote.QSCGetStatusResponse, er
 	}
 
 	return toReturn, err
+}
+
+func SetControlStatus(address, name, value string) (qsysremote.QSCSetStatusResponse, error) {
+	var err error
+	req := qsysremote.GetGenericSetStatusRequest()
+	val := qsysremote.QSCSetStatusResponse{}
+
+	req.Params.Name = name
+	req.Params.Value, err = strconv.ParseFloat(value, 64)
+	if err != nil {
+		return val, errors.New("Invalid value, must be a float")
+	}
+	log.Printf("sending: %v:%v to %v", req.Params.Name, req.Params.Value, address)
+
+	resp, err := qsysremote.SendCommand(address, req)
+	if err != nil {
+		log.Printf(color.HiRedString("Error: %v", err.Error()))
+		return val, err
+	}
+
+	//we need to unmarshal our response, parse it for the value we care about, then role with it from there
+	err = json.Unmarshal(resp, &val)
+	if err != nil {
+		log.Printf(color.HiRedString("Error: %v", err.Error()))
+		return val, err
+	}
+	if val.Result.Name != name {
+		errmsg := fmt.Sprintf("Invalid response, the name recieved does not match the name sent %v/%v", name, val.Result.Name)
+		log.Printf(color.HiRedString(errmsg))
+		return val, errors.New(errmsg)
+	}
+
+	return val, nil
 }
