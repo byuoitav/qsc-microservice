@@ -91,3 +91,26 @@ func Test(context echo.Context) error {
 	}
 	return context.JSON(http.StatusOK, toBind)
 }
+
+func GetGeneric(context echo.Context) error {
+	address := context.Param("address")
+	name := context.Param("name")
+
+	status, err := helpers.GetControlStatus(address, name)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return context.JSON(http.StatusOK, status)
+}
+
+func SetGeneric(context echo.Context) error {
+	address := context.Param("address")
+	name := context.Param("name")
+	value := context.Param("value")
+
+	status, err := helpers.SetControlStatus(address, name, value)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, err.Error())
+	}
+	return context.JSON(http.StatusOK, status)
+}
