@@ -27,7 +27,8 @@ func main() {
 	secure.GET("/:address/:name/volume/level", handlers.GetVolume)
 	secure.GET("/:address/:name/mute/status", handlers.GetMute)
 
-	secure.PUT("/test", handlers.Test)
+	secure.PUT("/:address/generic/:name/:value", handlers.SetGeneric)
+	secure.GET("/:address/generic/:name", handlers.GetGeneric)
 
 	server := http.Server{
 		Addr:           port,
