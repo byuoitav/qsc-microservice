@@ -26,7 +26,11 @@ VENDOR=gvt fetch -branch $(BRANCH)
 # docker
 DOCKER=docker
 DOCKER_BUILD=$(DOCKER) build
+<<<<<<< HEAD
 DOCKER_LOGIN=$(DOCKER) login -u $(UNAME) -p $(PASS)
+=======
+DOCKER_LOGIN=$(DOCKER) login -e $(EMAIL) -u $(UNAME) -p $(PASS)
+>>>>>>> 213b4d226d1048d3f2e8d8b908246903e5c90470
 DOCKER_PUSH=$(DOCKER) push
 DOCKER_FILE=dockerfile
 DOCKER_FILE_ARM=dockerfile-arm
