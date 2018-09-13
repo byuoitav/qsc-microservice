@@ -64,6 +64,7 @@ endif
 
 docker: docker-x86 docker-arm
 
+
 docker-x86: $(NAME)-bin
 ifeq "$(BRANCH)" "master"
 	$(eval BRANCH=development)
@@ -80,10 +81,16 @@ docker-arm: $(NAME)-arm
 ifeq "$(BRANCH)" "master"
 	$(eval BRANCH=development)
 endif
+ifeq "$(BRANCH)" "production"
+	$(eval BRANCH=latest)
+endif
 	$(DOCKER_BUILD) --build-arg NAME=$(NAME) -f $(DOCKER_FILE_ARM) -t $(ORG)/rpi-$(NAME):$(BRANCH) .
 	@echo logging in to dockerhub...
 	@$(DOCKER_LOGIN)
 	$(DOCKER_PUSH) $(ORG)/rpi-$(NAME):$(BRANCH)
+ifeq "$(BRANCH)" "latest"
+	$(eval BRANCH=production)
+endif
 ifeq "$(BRANCH)" "development"
 	$(eval BRANCH=master)
 endif
