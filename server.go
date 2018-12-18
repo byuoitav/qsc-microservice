@@ -29,7 +29,7 @@ func main() {
 
 	secure.PUT("/:address/generic/:name/:value", handlers.SetGeneric)
 	secure.GET("/:address/generic/:name", handlers.GetGeneric)
-	secure.GET("/:address/info", handlers.GetInfo)
+	secure.GET("/:address/hardware", handlers.GetInfo)
 
 	server := http.Server{
 		Addr:           port,
