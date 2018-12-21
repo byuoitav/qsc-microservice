@@ -35,6 +35,14 @@ type QSCGetStatusResult struct {
 	Position float64
 }
 
+// QSCStatusGetResponse is the values that we are getting back from the StatusGet method
+type QSCStatusGetResult struct {
+	Platform   string
+	State      string
+	DesignName string
+	DesignCode string
+}
+
 type QSCGetStatusRequest struct {
 	BaseRequest
 	Params []string `json:"params"`
@@ -45,6 +53,7 @@ type QSCSetStatusRequest struct {
 	Params QSCSetStatusParams `json:"params"`
 }
 
+// QSCSetStatusParams is the parameters for the Control.Set method
 type QSCSetStatusParams struct {
 	Name  string
 	Value float64
@@ -55,10 +64,27 @@ type QSCSetStatusResponse struct {
 	Result QSCGetStatusResult `json:"result"`
 }
 
+// QSCStatusGetRequest is for the StatusGet method
+type QSCStatusGetRequest struct {
+	BaseRequest
+	Params int `json:"params"`
+}
+
+// QSCStatusGetResponse gets the JSON response after calling the StatusGet method
+type QSCStatusGetResponse struct {
+	BaseRequest
+	Result QSCStatusGetResult `json:"result"`
+}
+
 func GetGenericSetStatusRequest() QSCSetStatusRequest {
 	return QSCSetStatusRequest{BaseRequest: BaseRequest{JSONRPC: "2.0", ID: 1, Method: "Control.Set"}, Params: QSCSetStatusParams{}}
 }
 
 func GetGenericGetStatusRequest() QSCGetStatusRequest {
 	return QSCGetStatusRequest{BaseRequest: BaseRequest{JSONRPC: "2.0", ID: 1, Method: "Control.Get"}, Params: []string{}}
+}
+
+// GetGenericStatusGetRequest is used for retreiving EngineStatus and other information about the QSC
+func GetGenericStatusGetRequest() QSCStatusGetRequest {
+	return QSCStatusGetRequest{BaseRequest: BaseRequest{JSONRPC: "2.0", ID: 1, Method: "StatusGet"}, Params: 0}
 }
