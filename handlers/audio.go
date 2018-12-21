@@ -13,6 +13,7 @@ import (
 	"github.com/labstack/echo"
 )
 
+// Mute is used for muting through the DSP
 func Mute(context echo.Context) error {
 	address := context.Param("address")
 	name := context.Param("name")
@@ -25,6 +26,7 @@ func Mute(context echo.Context) error {
 	return context.JSON(http.StatusOK, status)
 }
 
+// UnMute is used for unmuting through the DSP
 func UnMute(context echo.Context) error {
 	address := context.Param("address")
 	name := context.Param("name")
@@ -38,6 +40,7 @@ func UnMute(context echo.Context) error {
 
 }
 
+// SetVolume adjusts the volume of the DSP
 func SetVolume(context echo.Context) error {
 	address := context.Param("address")
 	name := context.Param("name")
@@ -58,6 +61,7 @@ func SetVolume(context echo.Context) error {
 	return context.JSON(http.StatusOK, status)
 }
 
+// GetVolume returns the volume of the DSP
 func GetVolume(context echo.Context) error {
 	address := context.Param("address")
 	name := context.Param("name")
@@ -70,6 +74,7 @@ func GetVolume(context echo.Context) error {
 	return context.JSON(http.StatusOK, status)
 }
 
+// GetMute returns the Mute status of the DSP
 func GetMute(context echo.Context) error {
 	address := context.Param("address")
 	name := context.Param("name")
@@ -113,4 +118,17 @@ func SetGeneric(context echo.Context) error {
 		return context.JSON(http.StatusInternalServerError, err.Error())
 	}
 	return context.JSON(http.StatusOK, status)
+}
+
+// GetInfo is used for getting information about the QSC DSP
+func GetInfo(context echo.Context) error {
+	// address is the IP address of the DSP
+	address := context.Param("address")
+
+	response, err := helpers.GetDetails(address)
+	if err != nil {
+		return context.JSON(http.StatusInternalServerError, err.Error())
+	}
+
+	return context.JSON(http.StatusOK, response)
 }
