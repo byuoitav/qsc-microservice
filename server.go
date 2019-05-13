@@ -4,16 +4,14 @@ import (
 	"net/http"
 
 	"github.com/byuoitav/authmiddleware"
+	"github.com/byuoitav/common"
 	"github.com/byuoitav/qsc-microservice/handlers"
 	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
 )
 
 func main() {
 	port := ":8016"
-	router := echo.New()
-	router.Pre(middleware.RemoveTrailingSlash())
-	router.Use(middleware.CORS())
+	router := common.NewRouter()
 
 	// Use the `secure` routing group to require authentication
 	secure := router.Group("", echo.WrapMiddleware(authmiddleware.Authenticate))
