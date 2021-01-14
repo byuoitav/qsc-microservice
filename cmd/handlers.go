@@ -19,11 +19,12 @@ type Handlers struct {
 }
 
 func (h *Handlers) RegisterRoutes(group *echo.Group) {
-	qsc := group.Group("/QSC/:address")
+	qsc := group.Group("")
 
-	qsc.GET("/block/:block/volume", func(c echo.Context) error {
+	qsc.GET("/:address/:name/volume/level", func(c echo.Context) error {
 		addr := c.Param("address")
-		block := c.Param("block")
+		name := c.Param("name")
+		name += "Gain"
 		dsp := h.CreateDSP(addr)
 		l := log.New(os.Stderr, fmt.Sprintf("[%v] ", addr), log.Ldate|log.Ltime|log.Lmicroseconds)
 
@@ -32,7 +33,7 @@ func (h *Handlers) RegisterRoutes(group *echo.Group) {
 		ctx, cancel := context.WithTimeout(c.Request().Context(), 5*time.Second)
 		defer cancel()
 
-		vols, err := dsp.Volumes(ctx, []string{block})
+		vols, err := dsp.Volumes(ctx, []string{name})
 		if err != nil {
 			l.Printf("unable to get volumes: %s", err)
 			return c.String(http.StatusInternalServerError, err.Error())
@@ -40,10 +41,10 @@ func (h *Handlers) RegisterRoutes(group *echo.Group) {
 
 		l.Printf("Got volumes: %+v", vols)
 
-		vol, ok := vols[block]
+		vol, ok := vols[name]
 		if !ok {
-			l.Printf("invalid block %q requested", block)
-			return c.String(http.StatusBadRequest, "invalid block")
+			l.Printf("invalid name %q requested", name)
+			return c.String(http.StatusBadRequest, "invalid name")
 		}
 
 		return c.JSON(http.StatusOK, status.Volume{
@@ -51,9 +52,10 @@ func (h *Handlers) RegisterRoutes(group *echo.Group) {
 		})
 	})
 
-	qsc.GET("/block/:block/mute", func(c echo.Context) error {
+	qsc.GET("/:address/:name/mute/status", func(c echo.Context) error {
 		addr := c.Param("address")
-		block := c.Param("block")
+		name := c.Param("name")
+		name += "Mute"
 		dsp := h.CreateDSP(addr)
 		l := log.New(os.Stderr, fmt.Sprintf("[%v] ", addr), log.Ldate|log.Ltime|log.Lmicroseconds)
 
@@ -62,7 +64,7 @@ func (h *Handlers) RegisterRoutes(group *echo.Group) {
 		ctx, cancel := context.WithTimeout(c.Request().Context(), 5*time.Second)
 		defer cancel()
 
-		mutes, err := dsp.Mutes(ctx, []string{block})
+		mutes, err := dsp.Mutes(ctx, []string{name})
 		if err != nil {
 			l.Printf("unable to get mutes: %s", err)
 			return c.String(http.StatusInternalServerError, err.Error())
@@ -70,10 +72,10 @@ func (h *Handlers) RegisterRoutes(group *echo.Group) {
 
 		l.Printf("Got mutes: %+v", mutes)
 
-		mute, ok := mutes[block]
+		mute, ok := mutes[name]
 		if !ok {
-			l.Printf("invalid block %q requested", block)
-			return c.String(http.StatusBadRequest, "invalid block")
+			l.Printf("invalid name %q requested", name)
+			return c.String(http.StatusBadRequest, "invalid name")
 		}
 
 		return c.JSON(http.StatusOK, status.Mute{
@@ -81,9 +83,10 @@ func (h *Handlers) RegisterRoutes(group *echo.Group) {
 		})
 	})
 
-	qsc.GET("/block/:block/volume/:volume", func(c echo.Context) error {
+	qsc.GET("/:address/:name/volume/set/:volume", func(c echo.Context) error {
 		addr := c.Param("address")
-		block := c.Param("block")
+		name := c.Param("name")
+		name += "Gain"
 		dsp := h.CreateDSP(addr)
 		l := log.New(os.Stderr, fmt.Sprintf("[%v] ", addr), log.Ldate|log.Ltime|log.Lmicroseconds)
 
@@ -92,12 +95,12 @@ func (h *Handlers) RegisterRoutes(group *echo.Group) {
 			return c.String(http.StatusBadRequest, err.Error())
 		}
 
-		l.Printf("setting volume on %q to %d", block, vol)
+		l.Printf("setting volume on %q to %d", name, vol)
 
 		ctx, cancel := context.WithTimeout(c.Request().Context(), 5*time.Second)
 		defer cancel()
 
-		err = dsp.SetVolume(ctx, block, vol)
+		err = dsp.SetVolume(ctx, name, vol)
 		if err != nil {
 			l.Printf("unable to set volume: %s", err)
 			return c.String(http.StatusInternalServerError, err.Error())
@@ -109,31 +112,51 @@ func (h *Handlers) RegisterRoutes(group *echo.Group) {
 		})
 	})
 
-	qsc.GET("/block/:block/muted/:mute", func(c echo.Context) error {
+	qsc.GET("/:address/:name/volume/mute", func(c echo.Context) error {
 		addr := c.Param("address")
-		block := c.Param("block")
+		name := c.Param("name")
+		name += "Mute"
 		dsp := h.CreateDSP(addr)
 		l := log.New(os.Stderr, fmt.Sprintf("[%v] ", addr), log.Ldate|log.Ltime|log.Lmicroseconds)
 
-		mute, err := strconv.ParseBool(c.Param("mute"))
-		if err != nil {
-			return c.String(http.StatusBadRequest, err.Error())
-		}
-
-		l.Printf("setting mute on %q to %v", block, mute)
+		l.Printf("setting mute on %q to true", name)
 
 		ctx, cancel := context.WithTimeout(c.Request().Context(), 5*time.Second)
 		defer cancel()
 
-		err = dsp.SetMute(ctx, block, mute)
+		err := dsp.SetMute(ctx, name, true)
 		if err != nil {
-			l.Printf("unable to set volume: %s", err)
+			l.Printf("unable to mute: %s", err)
 			return c.String(http.StatusInternalServerError, err.Error())
 		}
 
 		l.Printf("Set mute")
 		return c.JSON(http.StatusOK, status.Mute{
-			Muted: mute,
+			Muted: true,
+		})
+	})
+
+	qsc.GET("/:address/:name/volume/unmute", func(c echo.Context) error {
+		addr := c.Param("address")
+		name := c.Param("name")
+		name += "Mute"
+		dsp := h.CreateDSP(addr)
+		l := log.New(os.Stderr, fmt.Sprintf("[%v] ", addr), log.Ldate|log.Ltime|log.Lmicroseconds)
+
+		l.Printf("setting mute on %q to false", name)
+
+		ctx, cancel := context.WithTimeout(c.Request().Context(), 5*time.Second)
+		defer cancel()
+
+		err := dsp.SetMute(ctx, name, false)
+		if err != nil {
+			l.Printf("unable to unmute: %s", err)
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
+
+		l.Printf("Set mute")
+		return c.JSON(http.StatusOK, status.Mute{
+			Muted: false,
 		})
 	})
 }

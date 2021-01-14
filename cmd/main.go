@@ -7,6 +7,7 @@ import (
 	"os"
 	"sync"
 
+	qsc "github.com/byuoitav/qsc"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/spf13/pflag"
@@ -26,7 +27,7 @@ func main() {
 	}
 
 	dsps := &sync.Map{}
-	cfg := zap.NewProductionConfig{}
+	cfg := zap.NewProductionConfig()
 	cfg.Level.SetLevel(zapcore.DebugLevel)
 
 	handlers := Handlers{
@@ -45,7 +46,7 @@ func main() {
 	e := echo.New()
 	e.Pre(middleware.RemoveTrailingSlash())
 
-	api := e.Group("/api/v1")
+	api := e.Group("")
 	handlers.RegisterRoutes(api)
 
 	log.Printf("Server started on %v", lis.Addr())
