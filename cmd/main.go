@@ -19,6 +19,8 @@ func main() {
 	var port int
 	pflag.IntVarP(&port, "port", "P", 8080, "port to run the server on")
 
+	pflag.Parse()
+
 	addr := fmt.Sprintf(":%d", port)
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {

@@ -2,7 +2,7 @@ module github.com/byuoitav/qsc-microservice
 
 go 1.15
 
-replace github.com/byuoitav/qsc => /home/werndog/Documents/programming/qsc
+replace github.com/byuoitav/qsc => ../../../../../work/qsc
 
 require (
 	github.com/aws/aws-sdk-go v1.36.24 // indirect
