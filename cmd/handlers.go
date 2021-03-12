@@ -159,4 +159,54 @@ func (h *Handlers) RegisterRoutes(group *echo.Group) {
 			Muted: false,
 		})
 	})
+
+	qsc.PUT("/:address/generic/:name/:value", func(c echo.Context) error {
+		addr := c.Param("address")
+		name := c.Param("name")
+		val, err := strconv.ParseFloat(c.Param("value"), 64)
+		if err != nil {
+			return c.String(http.StatusBadRequest, err.Error())
+		}
+
+		dsp := h.CreateDSP(addr)
+		l := log.New(os.Stderr, fmt.Sprintf("[%v] ", addr), log.Ldate|log.Ltime|log.Lmicroseconds)
+		l.Printf("setting control value on %q to %v", name, val)
+
+		ctx, cancel := context.WithTimeout(c.Request().Context(), 5*time.Second)
+		defer cancel()
+
+		err = dsp.SetControl(ctx, name, val)
+		if err != nil {
+			l.Printf("unable to set control: %s", err)
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
+
+		l.Printf("Set control")
+		return c.JSON(http.StatusOK, map[string]float64{
+			name: val,
+		})
+	})
+
+	qsc.GET("/:address/generic/:name", func(c echo.Context) error {
+		addr := c.Param("address")
+		name := c.Param("name")
+
+		dsp := h.CreateDSP(addr)
+		l := log.New(os.Stderr, fmt.Sprintf("[%v] ", addr), log.Ldate|log.Ltime|log.Lmicroseconds)
+		l.Printf("getting control value on %q", name)
+
+		ctx, cancel := context.WithTimeout(c.Request().Context(), 5*time.Second)
+		defer cancel()
+
+		val, err := dsp.Control(ctx, name)
+		if err != nil {
+			l.Printf("unable to get control: %s", err)
+			return c.String(http.StatusInternalServerError, err.Error())
+		}
+
+		l.Printf("Got control")
+		return c.JSON(http.StatusOK, map[string]float64{
+			name: val,
+		})
+	})
 }
